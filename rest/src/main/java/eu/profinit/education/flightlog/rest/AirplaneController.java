@@ -17,4 +17,11 @@ public class AirplaneController {
     // Tip: letadla získáte voláním AirplaneService
     // Tip: bude se volat metoda GET na /airplane
     // Tip: struktura odpovědi je dána objektem AirplaneTo
+
+    private final AirplaneService airplaneService;
+
+    @GetMapping("/airplane")
+    public List<AirplaneTo> getClubAirplanes() {
+        return airplaneService.getClubAirplanes();
+    }
 }
