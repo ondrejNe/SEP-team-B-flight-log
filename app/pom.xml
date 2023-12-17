@@ -6,7 +6,7 @@
     <parent>
         <artifactId>flightlog</artifactId>
         <groupId>eu.profinit.education.flightlog</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     <packaging>jar</packaging>
 
