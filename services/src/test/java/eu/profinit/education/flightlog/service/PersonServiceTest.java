@@ -88,10 +88,36 @@ class PersonServiceTest {
         assertSame(clubMemberFromDd, person, "Should return prepared instance");
     }
 
-    @Disabled("Test is not implemented")
+
     @Test
     void shouldCreateNewClubMember() {
-        // TODO 7.1: Naimplementujte unit test s pouzitim mocku
+        //prep data
+        String testName = "test_name";
+        String testLastName = "test_last_name";
+        Long personID = 2L;
+
+        PersonTo newClubMember = PersonTo.builder()
+            .memberId(personID)
+            .firstName(testName)
+            .lastName(testLastName)
+            .build();
+        User user = new User(2L,testName,testLastName,List.of("ROLE_PILOT"));
+
+        //mock behavior
+        when(personRepository.findByMemberId(personID))
+            .thenReturn(Optional.empty());
+        when(personRepository.save(any()))
+            .thenAnswer(AdditionalAnswers.returnsFirstArg());
+        when(clubDatabaseDao.getUsers()).thenReturn(List.of(user));
+
+        //test method
+        Person result = testSubject.getExistingOrCreatePerson(newClubMember);
+
+        //verify results
+        assertEquals(Person.Type.CLUB_MEMBER, result.getPersonType(), "Person type does not match");
+        assertEquals(testName, result.getFirstName(), "First name does not match");
+        assertEquals(testLastName ,result.getLastName(), "Last name does not match");
+
     }
 
 }

@@ -14,6 +14,11 @@ public class AirplaneServiceImpl implements AirplaneService {
 
     private final ClubAirplaneRepository clubAirplaneRepository;
 
+    /**
+     * Retrieves a sorted list of airplanes belonging to the club.
+     *
+     * @return A list of {@link AirplaneTo} representing club airplanes, sorted by immatriculation.
+     */
     @Override
     public List<AirplaneTo> getClubAirplanes() {
         return clubAirplaneRepository.findAll(Sort.by("immatriculation")).stream().map(AirplaneTo::fromEntity).toList();

@@ -66,7 +66,6 @@ public class FlightController {
     @RequestMapping("flight/export")
     public ResponseEntity<byte[]> getCsvExport(){
         FileExportTo flightsCsv = csvExportService.getAllFlightsAsCsv();
-
         return ResponseEntity.ok()
             .contentType(flightsCsv.getContentType())
             .header("Content-Disposition", "attachment; filename=" + flightsCsv.getFileName())

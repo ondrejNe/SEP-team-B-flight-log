@@ -21,6 +21,11 @@ public class PersonServiceImpl implements PersonService {
     private final PersonRepository personRepository;
     private final ClubDatabaseDao clubDatabaseDao;
 
+    /**
+     * Retrieves a list of club members.
+     *
+     * @return List of PersonTo representing club members.
+     */
     @Override
     public List<PersonTo> getClubMembers() {
         return clubDatabaseDao.getUsers().stream().map(this::convert2To)
@@ -34,6 +39,12 @@ public class PersonServiceImpl implements PersonService {
             .orElseThrow(() -> new NotFoundException("Club member with ID {} does not exist.", memberId));
     }
 
+    /**
+     * Retrieves an existing club member or creates a new person entity based on the provided PersonTo.
+     *
+     * @param personTo PersonTo object representing the person's details.
+     * @return Person object representing an existing club member or a newly created person entity.
+     */
     @Override
     public Person getExistingOrCreatePerson(PersonTo personTo) {
         if (personTo == null) {

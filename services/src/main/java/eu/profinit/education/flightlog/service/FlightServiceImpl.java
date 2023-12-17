@@ -3,6 +3,8 @@ package eu.profinit.education.flightlog.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,12 @@ public class FlightServiceImpl implements FlightService {
 
     private final PersonService personService;
 
+    /**
+     * Initiates takeoff for a flight.
+     *
+     * @param flightStart Details for initiating the flight takeoff.
+     * @throws ValidationException if required data for takeoff is missing.
+     */
     @Override
     public void takeoff(FlightTakeoffTo flightStart) {
         if (flightStart.getTakeoffTime() == null) {
@@ -54,6 +62,7 @@ public class FlightServiceImpl implements FlightService {
             flightRepository.save(gliderFlight);
         }
     }
+
 
     private Flight createTowPlaneFlight(FlightTakeoffTo flightStart) {
         if (flightStart.getTowplane() == null) {
@@ -89,6 +98,14 @@ public class FlightServiceImpl implements FlightService {
         }
     }
 
+    /**
+     * Marks the landing of a flight with the given ID and landing time.
+     *
+     * @param flightId     ID of the flight.
+     * @param landingTime  Time when the flight landed.
+     * @throws NotFoundException      if the flight with the given ID does not exist.
+     * @throws ValidationException    if landing time is before takeoff time or the flight has already landed.
+     */
     @Override
     public void land(FlightId flightId, LocalDateTime landingTime) {
         Assert.notNull(flightId, "Flight ID cannot be null");
@@ -107,23 +124,38 @@ public class FlightServiceImpl implements FlightService {
         flightRepository.save(flight);
     }
 
+    /**
+     * Retrieves a list of flights currently in the air (Landing time == null).
+     *
+     * @return List of FlightTo representing flights in the air.
+     */
     @Transactional(readOnly = true)
     @Override
     public List<FlightTo> getFlightsInTheAir() {
-        // TODO 2.5: načtěte lety ve vzduchu pomocí vaší nové metody ve FlightRepository
-        // Tip: Můžete použít Java 8 Stream API pro konverzi na Transfer Object (TO)
-        List<Flight> flights =
-            flightRepository.findAllByLandingTimeNullOrderByTakeoffTimeAscIdAsc();
-        List<FlightTo> flightTos = new ArrayList<>();
-        for (Flight flight : flights){
-            flightTos.add(FlightTo.fromEntity(flight));
-        }
-        return flightTos;
+        return flightRepository.findAllByLandingTimeNullOrderByTakeoffTimeAscIdAsc()
+            .stream()
+            .map(FlightTo::fromEntity)
+            .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves flights data for generating a report.
+     *
+     * @return List of FlightTuppleTo representing flights for a report.
+     */
     @Override
     public List<FlightTuppleTo> getFlightsForReport() {
-        // TODO 8.2: Nactete dvojice letu pro obrazovku report
-        return new ArrayList<>();
+        List<FlightTuppleTo> result = new ArrayList<>();
+        FlightTuppleTo.FlightTuppleToBuilder builder = FlightTuppleTo.builder();
+        List<Flight> allTowPlanes = flightRepository.findAllByFlightTypeOrderByTakeoffTimeAscIdAsc(Flight.Type.TOWPLANE);
+        for (Flight singleFlight : allTowPlanes) {
+            Flight gliderFlight = singleFlight.getGliderFlight();
+            result.add(
+                builder.towplane(FlightTo.fromEntity(singleFlight))
+                    .glider(FlightTo.fromEntity(gliderFlight))
+                    .build()
+            );
+        }
+        return result;
     }
 }

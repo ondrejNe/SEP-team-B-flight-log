@@ -1,6 +1,7 @@
 package eu.profinit.education.flightlog.domain.repositories;
 
 import eu.profinit.education.flightlog.AbstractIntegrationTest;
+import eu.profinit.education.flightlog.domain.entities.Flight;
 import eu.profinit.education.flightlog.domain.entities.Person;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,4 +40,5 @@ class PersonRepositoryTest extends AbstractIntegrationTest {
         assertEquals(testClubMemberId, maybeClubMember.get().getMemberId(), "Member ID should be 1");
 
     }
+
 }
